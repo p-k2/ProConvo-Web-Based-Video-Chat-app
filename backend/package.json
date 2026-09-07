@@ -10,9 +10,11 @@
 
   "scripts": {
 
-    "dev" : "nodemon src/app.js" ,
-    "start" : "node src/app.js",
-    "prod" : "pm2 src/app.js"
+    "dev": "nodemon src/app.js",
+
+    "start": "node src/app.js",
+
+    "prod": "pm2 src/app.js"
 
   },
 
@@ -27,6 +29,8 @@
     "bcrypt": "^6.0.0",
 
     "cors": "^2.8.6",
+
+    "crypto": "^1.0.1",
 
     "express": "^5.2.1",
 
