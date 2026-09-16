@@ -1,0 +1,70 @@
+.landingpageContainer {
+
+  height: 100vh;
+  width: 100vw;
+  background-image: url('/background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+}
+
+.landingpageContainer nav {
+  padding-inline: 1.2rem;
+  padding-block: 1.6rem;
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landingpageContainer nav h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.landingpageContainer nav .navList {
+  display:flex;
+  gap:1.6rem;
+  cursor: pointer;
+}
+
+.landingpageContainer nav .navList div{
+  width: 100px;
+  height: 50px;
+  background-color: #d97500;
+  border: 1px solid white;
+  border-radius: 8%;
+  text-align: center;
+}
+
+
+.landingMainContainer {
+  display: flex;
+  justify-content: space-between ;
+  padding-inline: 3rem;
+  padding-top: 2rem;
+  align-items: center;
+}
+
+.landingMainContainer > div:nth-child(1){
+ font-size: 2.2rem;
+}
+
+.landingMainContainer > div:nth-child(1) div[role='button']{
+ background: #d97500;
+ width: fit-content;
+ padding: 1rem;
+ border-radius: 20px;
+ margin-top: 1.9rem;
+}
+
+.landingMainContainer > div:nth-child(1) div[role='button'] a{
+  text-decoration: none;
+  color: white;
+  font-size: 1.7rem;
+}
+
+.landingMainContainer > div:nth-child(2) img{
+  height: 70vh;
+  width: auto;
+
+}
