@@ -11,6 +11,8 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { AuthContext } from '../contexts/AuthContext.jsx';
+import Snackbar from '@mui/material/Snackbar';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,17 +35,41 @@ const Card = styled(MuiCard)(({ theme }) => ({
 export default function Authentication() {
 
   const [username, setUsername] = React.useState() ;
-  const [passowrd, setPassowrd] = React.useState() 
+  const [password, setPassword] = React.useState() 
   const [name, setName] = React.useState() ;
   const [error, setError] = React.useState() ;
-  const [messages, setMessages] = React.useState() ;
+  const [message, setMessage] = React.useState() ;
 
 
 
   const [formState, setFormState] = React.useState(0) ;
   const [open, setOpen] = React.useState(false) ;
+  const {handleRegister , handleLogin} = React.useContext(AuthContext);
+  let handleAuth = async () =>{
+  try{
+    if(formState ==0){
+      let result = await handleLogin( username, password) ;
+      
+  }
+    
+    if( formState ==1){
+        let result = await handleRegister(name, username, password) ;
+        console.log(result);
+        setMessage(result) ;
+        setOpen(true) ;
+        setError("");
+        setFormState(0);
+        setPassword("");
+        setUsername("");
+    }
+  } catch(err){
+    console.log(err);
+    let message = (err.response.data.message);
+    setError(message) ;
+  }
+} 
 
-  return (
+return (
     <Card variant="outlined">
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
         {/* <SitemarkIcon /> */}
@@ -56,46 +82,54 @@ export default function Authentication() {
         sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
       >
        Welcome! Let's get started
+       
       </Typography>
-      <Button> 
+     <div>
+      <Button variant = {formState ==0? "contained": "" }  onClick = {()=>{setFormState(0)}}> 
         Sign in
-      </Button> <Button> 
+      </Button >
+       <Button variant = {formState ==1? "contained": "" }  onClick = {()=>{setFormState(1)}}> 
         Sign Up
       </Button>
+      </div> 
       <Box
         component="form"
         noValidate
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
         <FormControl>
-          <FormLabel htmlFor="username">Username</FormLabel>
+      
+          { formState ==1 ? 
+          <TextField
+            label= "Full Name"
+            id="name"
+            type="name"
+            name="name"
+            placeholder="name"
+           
+            autoFocus
+            required
+            fullWidth
+            variant="outlined"
+            onChange = {(e) =>setName(e.target.value)}
+          />: <></> }
+
+          <FormLabel htmlFor="username">Userame</FormLabel>
           <TextField
             
             id="username"
             type="username"
             name="username"
+          
             placeholder="Username"
-            autoComplete="username"
             autoFocus
             required
             fullWidth
             variant="outlined"
+            onChange = {(e) =>setUsername(e.target.value)}
             
           />
-            <FormLabel htmlFor="name">Name</FormLabel>
-          <TextField
-            
-            id="name"
-            type="name"
-            name="name"
-            placeholder="name"
-            autoComplete="name"
-            autoFocus
-            required
-            fullWidth
-            variant="outlined"
-            
-          />
+          
 
            <FormLabel htmlFor="password">Password</FormLabel>
           <TextField
@@ -104,36 +138,30 @@ export default function Authentication() {
             type="password"
             name="password"
             placeholder="password"
-            autoComplete="password"
+           
             autoFocus
             required
             fullWidth
             variant="outlined"
+            onChange = {(e) =>setPassword(e.target.value)}
             
           />
         </FormControl>
-        <FormControlLabel
-          control={<Checkbox value="remember" color="primary" />}
-          label="Remember me"
-        />
+       <p style = {{color: "red"}}> {error}</p>
       
-        <Button type="button" fullWidth variant="contained" >
-          Sign in
+        <Button type="button" fullWidth variant="contained" 
+        onClick = {handleAuth}>
+          {formState ==0 ?"LOGIN": "REGISTER"}
         </Button>
-        <Typography sx={{ textAlign: 'center' }}>
-          Don&apos;t have an account?{' '}
-          <span>
-            <Link
-              href="/material-ui/getting-started/templates/sign-in/"
-              variant="body2"
-              sx={{ alignSelf: 'center' }}
-            >
-              Sign up
-            </Link>
-          </span>
-        </Typography>
-      </Box>
       
+      </Box>
+      <Snackbar
+      
+      open= {open}
+      
+      autoHideDuration = {4000}
+      
+      message = {message}/>
     </Card>
   );
 }
