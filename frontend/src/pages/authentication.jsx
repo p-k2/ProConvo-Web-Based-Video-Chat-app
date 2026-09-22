@@ -114,7 +114,7 @@ return (
             onChange = {(e) =>setName(e.target.value)}
           />: <></> }
 
-          <FormLabel htmlFor="username">Userame</FormLabel>
+          <FormLabel htmlFor="username">Username</FormLabel>
           <TextField
             
             id="username"
