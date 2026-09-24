@@ -2,12 +2,8 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
@@ -100,6 +96,8 @@ return (
         <FormControl>
       
           { formState ==1 ? 
+          <>
+          <FormLabel htmlFor="username">Full Name</FormLabel>
           <TextField
             label= "Full Name"
             id="name"
@@ -112,7 +110,7 @@ return (
             fullWidth
             variant="outlined"
             onChange = {(e) =>setName(e.target.value)}
-          />: <></> }
+          /> </>: <></> }
 
           <FormLabel htmlFor="username">Username</FormLabel>
           <TextField
@@ -120,7 +118,7 @@ return (
             id="username"
             type="username"
             name="username"
-          
+            value = {username}
             placeholder="Username"
             autoFocus
             required
@@ -138,7 +136,7 @@ return (
             type="password"
             name="password"
             placeholder="password"
-           
+            value = {password}
             autoFocus
             required
             fullWidth

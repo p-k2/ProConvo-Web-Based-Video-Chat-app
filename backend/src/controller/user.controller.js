@@ -7,8 +7,10 @@ const login = async(req, res)=>{
 
     const {username, password} = req.body ;
 
-    if(!username || !password){
-        return res.status(400).json({message: "Please provide"})
+    if(!username ){
+        return res.status(400).json({message: "Please provide username"})
+    }else  if(!password ){
+        return res.status(400).json({message: "Please provide password"})
     }
 
     try{
@@ -32,6 +34,7 @@ const login = async(req, res)=>{
     } catch(e){
             return res.status(500).json({message:`Something went wrong ${e}`});
     }
+   
 }
 
 
