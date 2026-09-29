@@ -4,9 +4,21 @@ import { io } from "socket.io-client";
 
 // const socket = io("http://localhost:8000");
 
-import "../styles/videoComponent.css"
+import styles from "../styles/videoComponent.module.css"
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import CallEndIcon from '@mui/icons-material/CallEnd';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
+import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import Badge from '@mui/material/Badge';
+import ChatIcon from '@mui/icons-material/Chat';
+
+
 const server_url = "http://localhost:8000" ;
 
 const connections ={}
@@ -111,7 +123,7 @@ export default function VideoMeetComponent(){
         canvas.getContext('2d').fillRect(0,0, width, height);
 
         let stream = canvas.captureStream() ;
-        return Object.assign(toStreamable.getVideoTracks()[0] , {enabled: false})
+        return Object.assign(stream.getVideoTracks()[0] , {enabled: false})
     }
 
     let getUserMediaSuccess = (stream) =>{
@@ -230,6 +242,18 @@ export default function VideoMeetComponent(){
     // ---------- SDP ----------
     if (signal.sdp) {
 
+
+    if (
+        signal.sdp.type === "answer" &&
+        connection.signalingState !== "have-local-offer"
+    ) {
+        console.log(
+            "Ignoring answer because state is:",
+            connection.signalingState
+        );
+        return;
+    }
+
         connection
             .setRemoteDescription(
                 new RTCSessionDescription(signal.sdp)
@@ -250,6 +274,8 @@ export default function VideoMeetComponent(){
 
                 return connection
                     .setLocalDescription(answer);
+                
+
 
             })
             .then(() => {
@@ -299,7 +325,7 @@ export default function VideoMeetComponent(){
             socketRef.current.on("chat-message" , addMessage)
             socketRef.current.on("user-left" , (id)=>{
                 //todo
-                setVideos((videos) => videos.filter(video.socketId != id))
+                setVideos((videos) => videos.filter((video) => video.socketId != id))
             } )
 
             socketRef.current.on("user-joined" , (id, clients) =>{
@@ -355,24 +381,83 @@ export default function VideoMeetComponent(){
                 
                 })
 
-                if(id == socketIdRef.current){
-                    for( let id2 in connections){
+                if (id == socketIdRef.current) {
 
-                        if(id2 == socketIdRef.current) continue
+    for (let id2 in connections) {
 
-                        try{
-                            connections[id2].addStream(window.localStream)
-                        }catch(e){    }
+        if (id2 == socketIdRef.current) continue;
 
-                        connections[id2].createOffer().then((description)=>{
-                            connections[id2].setLocalDescription(description)
-                            .then(()=>{
-                                socketRef.current.emit("signal" , id2, JSON.stringify({"sdp": connections[id2].localDescription}))
-                            })
-                            .catch( e=> console.log(e))
-                        })
-                    }
-                }
+        const connection = connections[id2];
+
+        // IMPORTANT: Don't create another offer
+        // if this connection is already negotiating
+        if (connection.signalingState !== "stable") {
+            console.log(
+                "Skipping offer for",
+                id2,
+                "because state is:",
+                connection.signalingState
+            );
+            continue;
+        }
+
+        try {
+            if (window.localStream) {
+                connection.addStream(window.localStream);
+            }
+        } catch (e) {
+            console.log("addStream error:", e);
+        }
+
+        connection.createOffer()
+            .then((offer) => {
+
+                console.log("Created offer for:", id2);
+                console.log("Signaling state:", connection.signalingState);
+
+                return connection.setLocalDescription(offer);
+            })
+            .then(() => {
+
+                console.log(
+                    "Local description set:",
+                    connection.localDescription
+                );
+
+                socketRef.current.emit(
+                    "signal",
+                    id2,
+                    JSON.stringify({
+                        sdp: connection.localDescription
+                    })
+                );
+
+            })
+            .catch((e) => {
+                console.log("Offer/LocalDescription error:", e);
+            });
+    }
+}
+
+                // if(id == socketIdRef.current){
+                //     for( let id2 in connections){
+
+                //         if(id2 == socketIdRef.current) continue
+
+                //         try{
+                //             connections[id2].addStream(window.localStream)
+                //         }catch(e){    }
+
+                //         connections[id2].createOffer().then((description)=>{
+                //             connections[id2].setLocalDescription(description)
+                //             .then(()=>{
+                //                 console.log(connections[id2].localDescription) ; 
+                //                 socketRef.current.emit("signal" , id2, JSON.stringify({"sdp": connections[id2].localDescription}))
+                //             })
+                //             .catch( e=> console.log(e))
+                //         })
+                //     }
+                // }
                 
             })
         })
@@ -383,7 +468,17 @@ export default function VideoMeetComponent(){
         setVideo(videoAvailable) ;
         setAudio(audioAvailable) ;
 
+        setAskForUsername(false) ;
+
         connectToSocketServer() ;
+    }
+
+    let handleVideo =()=>{
+        setVideo(!video) 
+    }
+
+    let handleAudio=()=>{
+        setAudio(!audio)
     }
 
     return (
@@ -399,13 +494,45 @@ export default function VideoMeetComponent(){
                 <video ref = {localVideoRef} autoPlay muted> </video>
 
                 </div>
-            </div> : <>   <video ref = {localVideoRef} autoPlay muted> </video>
+            </div> : <div className= {styles.meetVideoContainer}>
+
+                <div className={ styles.buttonContainers}>
+                    
+                    <IconButton onClick={handleVideo} style = {{color: "white"}}>
+                        { (video == true) ? <VideocamIcon/> : <VideocamOffIcon/>  }
+                    </IconButton>
+                      <IconButton style = {{color: "red"}}>
+                       <CallEndIcon/>
+                    </IconButton>
+                      <IconButton onClick={handleAudio} style = {{color: "white"}}>
+                        { (audio == true) ? <MicIcon/> : <MicOffIcon/>  }
+                    </IconButton>
+                    {screenAvailable == true ?
+                    <IconButton style = {{color: "white"}}>
+                        {screen == true ? <ScreenShareIcon /> : <StopScreenShareIcon/>}
+                    </IconButton>    
+                : <></>
+                }
+
+                <Badge badgeContent = { newMessage} max = {999}  color="secondary" >
+
+                    <IconButton style = {{color: "white"}} >
+                        <ChatIcon />
+
+                    </IconButton>
+                </Badge>
+                    </div> 
+
+              <video className={styles.meetUserVideo} ref = {localVideoRef} autoPlay muted> </video>
+                      <div className= {styles.conferenceView} >
                         { videos.map((video)=> (
 
-                            <div key = { video.socketId}>
+                            <div 
+                            
+                             key = { video.socketId}>
                                 <h2> {video.socketId}</h2>
                                 <video
-                                
+                                class
                                 data-socket = {video.socketId}
                                 ref = {ref =>{
                                     if(ref && video.stream){
@@ -413,14 +540,14 @@ export default function VideoMeetComponent(){
                                     }
                                 }}
                                 autoPlay
-                                >
-                                    
+                                >    
                                 </video>
                             </div>
 
                         ))}
+                        </div>
             
-            </>
+            </div>
             } 
         </div>
     )
