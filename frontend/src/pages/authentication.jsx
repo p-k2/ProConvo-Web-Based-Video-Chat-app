@@ -10,6 +10,7 @@ import { styled } from '@mui/material/styles';
 import { AuthContext } from '../contexts/AuthContext.jsx';
 import Snackbar from '@mui/material/Snackbar';
 
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',

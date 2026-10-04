@@ -3,6 +3,7 @@ import LandingPage from "./pages/landing.jsx" ;
 import Authentication from "./pages/authentication.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import VideoMeetComponent from "./pages/videomeet.jsx";
+import HomeComponent from "./pages/home.jsx";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <AuthProvider>
       <Routes>
         <Route path = "/" element = {<LandingPage/>} />
+        <Route path = "/home" element = { <HomeComponent/>} />
         <Route path = "/auth" element = {<Authentication/>} />
         <Route path = "/:url" element = {<VideoMeetComponent/>} />
 
