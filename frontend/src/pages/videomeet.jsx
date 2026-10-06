@@ -500,7 +500,7 @@ export default function VideoMeetComponent(){
 
     let getDisplayMediaSuccess=()=>{
         try{
-            window.localStream.getTracks().foreach( track => track.stop())
+            window.localStream.getTracks().forEach( track => track.stop())
         } catch(e) { console.log(e)}
 
         window.localStream = stream ;
@@ -635,7 +635,7 @@ export default function VideoMeetComponent(){
 
                 <Badge badgeContent = { newMessages} max = {999}  color="secondary" >
 
-                    <IconButton onClick = {()=> setModal(!showModal)} style = {{color: "white"}} >
+                    <IconButton onClick = {()=> setShowModal(!showModal)} style = {{color: "white"}} >
                         <ChatIcon />
 
                     </IconButton>

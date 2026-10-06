@@ -43,6 +43,7 @@
 
 .chatRoom{
     position: absolute;
+    background-color: aliceblue;
     height: 90vh;
     right: 0;
     border-radius: 10px;
